@@ -69,6 +69,11 @@ public class ErrorCode {
     
     public static final int CONNECTION_CREATED = 39;
     public static final int AUTH_FAIL = 40;
+    
+    public static final int DISCUSS_NAME_IS_EMPTY = 41;
+    public static final int GROUP_ID_NOT_ASSIGNED = 42;
+    public static final int DISCUSS_NOT_EXIST = 43;
+    
 
     public static String getMsg(int errorCode){
         return "Error (code:"+errorCode+")";

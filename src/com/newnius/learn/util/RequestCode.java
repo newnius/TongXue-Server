@@ -42,7 +42,16 @@ public class RequestCode {
     public static final int SEND_WHITEBOARD_ACTION = 27;
     public static final int GET_WHITEBOARD_ACTION = 28;
     
+    public static final int CREATE_DISCUSS = 29;
+    public static final int JOIN_DISCUSS = 30;
+    public static final int QUIT_DISCUSS = 31;
+    public static final int SEND_BOARD_MESSAGE = 32;
+    public static final int GET_BOARD_MESSAGE = 33;
+    public static final int GET_ALL_DISCUSSES = 34;
+    
     /* received code */
-    public static final int NEW_MESSAGE = 1000;
+    public static final int NEW_GROUP_MESSAGE = 1000;
+    public static final int NEW_BOARD_MESSAGE = 1001;
+    public static final int NEW_BOARD_ACTION = 1002;
     
 }

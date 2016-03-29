@@ -188,7 +188,6 @@ public class Group {
 			group.set("introduction", "");
 		if (group.get("introduction").length() > 200)
 			return ErrorCode.LENGTH_NOT_MATCH;
-		;
 		if (!Group.canApplyGroup(user))
 			return ErrorCode.MAX_GROUP_JOINED_EXCEEDED;
 		if (!group.hasKey("icon"))
@@ -331,7 +330,7 @@ public class Group {
 				rs.next();
 				int mid = rs.getInt(1);
 				message.set("mid", mid);
-				S2CServer.broadcast(getGroupMembers(group), new Msg(RequestCode.NEW_MESSAGE, message));
+				S2CServer.broadcast(getGroupMembers(group), new Msg(RequestCode.NEW_GROUP_MESSAGE, message));
 				return ErrorCode.SUCCESS;
 			} else {
 				return ErrorCode.UNKNOWN;
@@ -440,11 +439,13 @@ public class Group {
 		if (group == null || !group.hasKey("groupID"))
 
 			try {
-				String sql = "SELECT 1 FROM `join_group` WHERE `group_id` = ?  AND `username` = ? AND `accepted`='t' ";
+				String sql = "SELECT count(1) FROM `join_group` WHERE `group_id` = ?  AND `username` = ? AND `accepted`='t' ";
 				String[] args = { group.getInt("groupID") + "", user.get("username") };
 				ResultSet rs = DAO.executeQuery(sql, args);
-				rs.last();
-				return rs.getRow() == 1;
+				int cnt = 0;
+				if(rs.next())
+					cnt = rs.getInt(0);
+				return cnt == 1;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -468,10 +469,13 @@ public class Group {
 
 	public static boolean canApplyGroup(TXObject user) {
 		try {
-			String sql = "SELECT 1 FROM `join_group` WHERE `username` = ? ";
+			String sql = "SELECT count(1) FROM `join_group` WHERE `username` = ? ";
 			String[] args = { user.get("username") };
 			ResultSet rs = DAO.executeQuery(sql, args);
-			return rs.getFetchSize() >= Config.getMaxGroupPerUser();
+			int groupCnt = Config.getMaxGroupPerUser();
+			if(rs.next())
+				groupCnt = rs.getInt(0);
+			return  groupCnt >= Config.getMaxGroupPerUser();
 		} catch (Exception ex) {
 			Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
 		}
