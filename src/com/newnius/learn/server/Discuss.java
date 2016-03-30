@@ -79,15 +79,15 @@ public class Discuss {
 		return new Msg(ErrorCode.SUCCESS, discusses);
 	}
 
-	public static Msg joinDiscuss(TXObject discuss) {
+	public static Msg joinDiscuss(TXObject discuss, TXObject currentUser) {
 		if (!discuss.hasKey("discussID"))
 			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
-		if (!discuss.hasKey("currentUser"))
+		if (currentUser == null || ! currentUser.hasKey("username"))
 			return new Msg(ErrorCode.USER_NOT_EXIST);
 
 		try {
 			String sql = "INSERT INTO `discuss_member` ( `discuss_id`, `username`, `time`) VALUES (?, ?, ?)";
-			String[] args = { discuss.getInt("discussID") + "", discuss.get("currentUser"),
+			String[] args = { discuss.getInt("discussID") + "", currentUser.get("username"),
 					System.currentTimeMillis() + "" };
 			int cnt = DAO.executeUpdate(sql, args);
 			if (cnt == 1) {
@@ -101,15 +101,15 @@ public class Discuss {
 		}
 	}
 
-	public static Msg quitDiscuss(TXObject discuss) {
+	public static Msg quitDiscuss(TXObject discuss, TXObject currentUser) {
 		if (!discuss.hasKey("discussID"))
 			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
-		if (!discuss.hasKey("currentUser"))
+		if (currentUser == null || ! currentUser.hasKey("username"))
 			return new Msg(ErrorCode.USER_NOT_EXIST);
 
 		try {
 			String sql = "DELETE FROM `discuss_member` WHERE `username` = ?";
-			String[] args = { discuss.get("currentUser") };
+			String[] args = { currentUser.get("username") };
 			int cnt = DAO.executeUpdate(sql, args);
 			if (cnt == 1) {
 				return new Msg(ErrorCode.SUCCESS);
@@ -153,8 +153,8 @@ public class Discuss {
 		}
 	}
 
-	public static List<TXObject> getWhiteBoardActions(TXObject discuss) {
-		return new ArrayList<TXObject>();
+	public static Msg getWhiteBoardActions(TXObject discuss, TXObject currentUser) {
+		return new Msg(ErrorCode.SUCCESS, new ArrayList<TXObject>());
 	}
 
 	public static Msg getDiscussById(TXObject discuss) {
@@ -193,29 +193,27 @@ public class Discuss {
 			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
 	}
 
-	public static int sendDiscussMessage(TXObject message) {
+	public static Msg sendDiscussMessage(TXObject message,  TXObject currentUser) {
 		if (message == null)
-			return ErrorCode.MESSAGE_IS_EMPTY;
-		if (!message.hasKey("username"))
-			return ErrorCode.USER_NOT_EXIST;
+			return new Msg(ErrorCode.MESSAGE_IS_EMPTY);
 		if (!message.hasKey("discussID"))
-			return ErrorCode.GROUP_NOT_EXIST;
+			return new Msg(ErrorCode.GROUP_NOT_EXIST);
 		if (!message.hasKey("type"))
-			return ErrorCode.TYPE_IS_EMPTY;
+			return new Msg(ErrorCode.TYPE_IS_EMPTY);
 		if (!message.hasKey("content"))
-			return ErrorCode.CONTENT_IS_EMPTY;
-		TXObject user = new TXObject();
-		user.set("username", message.get("username"));
+			return new Msg(ErrorCode.CONTENT_IS_EMPTY);
+		if (currentUser == null || !currentUser.hasKey("username"))
+			return new Msg(ErrorCode.USER_NOT_EXIST);
 		TXObject discuss = new TXObject();
 		discuss.set("discussID", message.getInt("discussID"));
-		if (!isUserMemberOf(user, discuss))
-			return ErrorCode.NO_ACCESS;
+		if (!isUserMemberOf(currentUser, discuss))
+			return new Msg(ErrorCode.NO_ACCESS);
 
 		message.set("time", System.currentTimeMillis());
 
 		try {
 			String sql = "INSERT INTO `discuss_message` (`discuss_id`, `username`, `type`, `content`, `time`) VALUES( ?, ?, ?, ?, ?)";
-			String[] args1 = { message.getInt("discussID") + "", message.get("username"), message.getInt("type") + "",
+			String[] args1 = { message.getInt("discussID") + "", currentUser.get("username"), message.getInt("type") + "",
 					message.get("content"), message.getLong("time") + "" };
 			int affected_rows = DAO.executeUpdate(sql, args1);
 			if (affected_rows > 0) {
@@ -225,37 +223,35 @@ public class Discuss {
 				int mid = rs.getInt(1);
 				message.set("messageID", mid);
 				S2CServer.broadcast(getDiscussMembers(message), new Msg(RequestCode.NEW_BOARD_MESSAGE, message));
-				return ErrorCode.SUCCESS;
+				return new Msg(ErrorCode.SUCCESS);
 			} else {
-				return ErrorCode.UNKNOWN;
+				return new Msg(ErrorCode.UNKNOWN);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ErrorCode.UNKNOWN;
+			return new Msg(ErrorCode.UNKNOWN);
 		}
 	}
 
-	public static List<TXObject> getDiscussMessage(TXObject user, TXObject discuss) {
+	public static Msg getDiscussMessage( TXObject discuss, TXObject currentUser) {
 		List<TXObject> messages = new ArrayList<>();
-		if (user == null)
-			return messages;
+		if (currentUser == null || !currentUser.hasKey("username"))
+			return new Msg(ErrorCode.USER_NOT_EXIST);
 		if (discuss == null)
-			return messages;
-		if (!user.hasKey("username"))
-			return messages;
+			return new Msg(ErrorCode.INCOMPLETE_INFORMATION);
 		if (!discuss.hasKey("discussID"))
-			return messages;
-		if (!isUserMemberOf(user, discuss))
-			return messages;
+			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
+		if (!isUserMemberOf(currentUser, discuss))
+			return new Msg(ErrorCode.NO_ACCESS);
 
 		try {
 			ResultSet rs;
-			String sql = "SELECT * FROM `group_chat` WHERE `group_id` = ? ORDER BY cid DESC LIMIT 30";
+			String sql = "SELECT * FROM `discuss_message` WHERE `discuss_id` = ? ORDER BY message_id DESC LIMIT 30";
 			String[] args = { discuss.getInt("discussID") + "" };
 			rs = DAO.executeQuery(sql, args);
-
+			
 			if (rs == null || rs.wasNull()) {
-				return messages;
+				return new Msg(ErrorCode.UNKNOWN);
 			}
 			while (rs.next()) {
 				TXObject message = new TXObject();
@@ -267,10 +263,10 @@ public class Discuss {
 				messages.add(message);
 			}
 			rs.close();
-			return messages;
+			return new Msg(ErrorCode.SUCCESS, messages);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return messages;
+			return new Msg(ErrorCode.UNKNOWN);
 		}
 	}
 
@@ -286,7 +282,7 @@ public class Discuss {
 			ResultSet rs = DAO.executeQuery(sql, args);
 			int cnt = 0;
 			if (rs.next())
-				cnt = rs.getInt(0);
+				cnt = rs.getInt(1);
 			return cnt == 1;
 		} catch (Exception ex) {
 			ex.printStackTrace();

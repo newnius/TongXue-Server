@@ -86,47 +86,35 @@ public class C2SStaff extends Thread {
 						currentUser = tmpuser;
 						C2SServer.addStaff(currentUser.get("username"), this);
 					}
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.REGISTER:// register
 					tmpuser = new Gson().fromJson(tmp, TXObject.class);
 					res = User.register(tmpuser);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.SEARCH_GROUP_BY_USER:// search group by name
 					group = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> groupList = Group.searchGroups(group);
 					res = new Msg(ErrorCode.SUCCESS, groupList);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.CREATE_GROUP:// create group
 					group = new Gson().fromJson(tmp, TXObject.class);
 					int code = Group.createGroup(currentUser, group);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.SEARCH_GROUP:// search group
 					group = new Gson().fromJson(tmp, TXObject.class);
 					groupList = Group.searchGroups(group);
 					res = new Msg(ErrorCode.SUCCESS, groupList);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.APPLY_GROUP:// apply for a group
 					group = new Gson().fromJson(tmp, TXObject.class);
 					int code2 = Group.apply(currentUser, group);
 					res = new Msg(code2, null);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.SEND_GROUP_MESSAGE:// send a chat in a group
@@ -134,88 +122,83 @@ public class C2SStaff extends Thread {
 					message.set("username", currentUser.get("username"));
 					code = Group.sendGroupMessage(message);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.GET_GROUP_MESSAGE:// get all group chats
 					group = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> chatList = Group.getGroupMessage(currentUser, group);
 					res = new Msg(ErrorCode.SUCCESS, chatList);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.QUIT_GROUP:// quit group || cancel apply
 					group = new Gson().fromJson(tmp, TXObject.class);
 					int code3 = Group.quitGroup(currentUser, group);
 					res = new Msg(code3);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.CREATE_DISCUSS:
 					discuss = new Gson().fromJson(tmp, TXObject.class);
 					res = Discuss.createDiscuss(discuss, currentUser);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.GET_ALL_DISCUSSES:
 					discuss = new Gson().fromJson(tmp, TXObject.class);
 					res = Discuss.getAllDiscusses(discuss);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.JOIN_DISCUSS:
+					discuss = new Gson().fromJson(tmp, TXObject.class);
+					res = Discuss.joinDiscuss(discuss, currentUser);
 					break;
 
 				case RequestCode.QUIT_DISCUSS:
+					discuss = new Gson().fromJson(tmp, TXObject.class);
+					res = Discuss.quitDiscuss(discuss, currentUser);
 					break;
 
 				case RequestCode.SEND_WHITEBOARD_ACTION:// send blackboard
 														// action(s)
 					res = new Msg(ErrorCode.SUCCESS);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					// List<TXObject> users = ;
 					// S2CServer.broadcast(users, str);
 					break;
 
-				case RequestCode.GET_WHITEBOARD_ACTION:// request blackboard
-														// action(s)
+				case RequestCode.GET_WHITEBOARD_ACTION:// request blackboard action(s)
+					discuss = new Gson().fromJson(tmp, TXObject.class);
+					res = Discuss.getWhiteBoardActions(discuss, currentUser);
+					break;
+					
+				case RequestCode.SEND_BOARD_MESSAGE:
+					message = new Gson().fromJson(tmp, TXObject.class);
+					res = Discuss.sendDiscussMessage(message, currentUser);
+					break;
+					
+				case RequestCode.GET_BOARD_MESSAGE:
+					discuss = new Gson().fromJson(tmp, TXObject.class);
+					res = Discuss.getDiscussMessage(discuss, currentUser);
 					break;
 
 				case RequestCode.POST_ARTICLE:// post article
 					article = new Gson().fromJson(tmp, TXObject.class);
 					code = Blog.postArticle(currentUser, article);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.UPDATE_ARTICLE:// update article
 					article = new Gson().fromJson(tmp, TXObject.class);
 					code = Blog.upArticle(currentUser, article);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 				case RequestCode.SEARCH_ARTICLE:// get article by id
 					article = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> articles = Blog.getArticles(article);
 					res = new Msg(ErrorCode.SUCCESS, articles);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.COMMENT_AT_ARTICLE:// add comment
 					comment = new Gson().fromJson(tmp, TXObject.class);
 					code = Blog.commentAtArticle(currentUser, comment);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.SEARCH_ARTICLE_COMMENT:// get comments of an
@@ -223,38 +206,28 @@ public class C2SStaff extends Thread {
 					article = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> comments = Blog.getCommentsOfArticle(article);
 					res = new Msg(ErrorCode.SUCCESS, comments);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.ASK_QUESTION:// ask question
 					question = new Gson().fromJson(tmp, TXObject.class);
 					code = FAQ.askQuestion(currentUser, question);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 				case RequestCode.SEARCH_QUESTION:// get all questions before
 													// question
 					question = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> questions = FAQ.getQuestions(question);
 					res = new Msg(ErrorCode.SUCCESS, questions);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 				case RequestCode.UPDATE_QUESTION:// update question
 					question = new Gson().fromJson(tmp, TXObject.class);
 					code = FAQ.updateQuestion(currentUser, question);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 				case RequestCode.DELETE_QUESTION:// delete question
 					question = new Gson().fromJson(tmp, TXObject.class);
 					code = FAQ.deleteQuestion(currentUser, question);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.SEARCH_QUESTION_ANSWER:// get answers by
@@ -262,22 +235,21 @@ public class C2SStaff extends Thread {
 					question = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> answers = FAQ.getAnswersByQuestion(question);
 					res = new Msg(ErrorCode.SUCCESS, answers);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				case RequestCode.ANSWER_QUESTION:// answer question
 					answer = new Gson().fromJson(tmp, TXObject.class);
 					code = FAQ.answerQuestion(currentUser, answer);
 					res = new Msg(code);
-					System.out.println("C2SStaff response: " + new Gson().toJson(res));
-					writer.println(new Gson().toJson(res));
 					break;
 
 				default:// unrecognized request
-					writer.println(new Gson().toJson(new Msg(ErrorCode.UNKNOWN)));
+					res = new Msg(ErrorCode.UNKNOWN);
 					break;
 				}
+				
+				System.out.println("C2SStaff response: " + new Gson().toJson(res));
+				writer.println(new Gson().toJson(res));
 
 			}
 
