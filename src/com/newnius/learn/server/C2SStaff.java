@@ -156,16 +156,14 @@ public class C2SStaff extends Thread {
 					res = Discuss.quitDiscuss(discuss, currentUser);
 					break;
 
-				case RequestCode.SEND_WHITEBOARD_ACTION:// send blackboard
-														// action(s)
-					res = new Msg(ErrorCode.SUCCESS);
-					// List<TXObject> users = ;
-					// S2CServer.broadcast(users, str);
+				case RequestCode.SEND_WHITEBOARD_ACTION:// send board action
+					TXObject action = new Gson().fromJson(tmp, TXObject.class);
+					res = WhiteBoard.sendBoardAction(action, currentUser);
 					break;
 
-				case RequestCode.GET_WHITEBOARD_ACTION:// request blackboard action(s)
+				case RequestCode.GET_WHITEBOARD_ACTION:// request board action(s)
 					discuss = new Gson().fromJson(tmp, TXObject.class);
-					res = Discuss.getWhiteBoardActions(discuss, currentUser);
+					res = WhiteBoard.getWhiteBoardActions(discuss, currentUser);
 					break;
 					
 				case RequestCode.SEND_BOARD_MESSAGE:

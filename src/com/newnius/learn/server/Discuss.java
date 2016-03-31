@@ -122,41 +122,6 @@ public class Discuss {
 		}
 	}
 
-	public static Msg sendWhiteBoardAction(TXObject action) {
-		if (action == null)
-			return new Msg(ErrorCode.INCOMPLETE_INFORMATION);
-		if (!action.hasKey("discussID"))
-			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
-		if (!action.hasKey("currentUser"))
-			return new Msg(ErrorCode.USER_NOT_EXIST);
-		Msg msg = getDiscussById(action);
-		if (msg.getCode() != ErrorCode.SUCCESS)
-			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
-		@SuppressWarnings("unchecked")
-		TXObject discusstmp = ((List<TXObject>) msg.getObj()).get(0);
-		if (!discusstmp.get("controller").equals(action.get("currentUser")))
-			return new Msg(ErrorCode.NO_ACCESS);
-
-		try {
-			String sql = "INSERT INTO `board_action` ( `discuss_id`, `username`, `time`) VALUES (?, ?, ?)";
-			String[] args = { action.getInt("discussID") + "", action.get("currentUser"),
-					System.currentTimeMillis() + "" };
-			int cnt = DAO.executeUpdate(sql, args);
-			if (cnt == 1) {
-				return new Msg(ErrorCode.SUCCESS);
-			} else {
-				return new Msg(ErrorCode.UNKNOWN);
-			}
-		} catch (Exception e) {
-			Logger.getLogger(Discuss.class.getName()).log(Level.SEVERE, null, e);
-			return new Msg(ErrorCode.UNKNOWN);
-		}
-	}
-
-	public static Msg getWhiteBoardActions(TXObject discuss, TXObject currentUser) {
-		return new Msg(ErrorCode.SUCCESS, new ArrayList<TXObject>());
-	}
-
 	public static Msg getDiscussById(TXObject discuss) {
 		List<TXObject> discusses = new ArrayList<>();
 		if (discuss == null || !discuss.hasKey("discussID"))
