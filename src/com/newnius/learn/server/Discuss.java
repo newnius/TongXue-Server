@@ -123,7 +123,7 @@ public class Discuss {
 	}
 
 	public static Msg getDiscussById(TXObject discuss) {
-		List<TXObject> discusses = new ArrayList<>();
+		TXObject res = null;
 		if (discuss == null || !discuss.hasKey("discussID"))
 			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
 
@@ -134,7 +134,7 @@ public class Discuss {
 			return new Msg(ErrorCode.UNKNOWN);
 
 		try {
-			while (rs.next()) {
+			if (rs.next()) {
 				TXObject localDiscuss = new TXObject();
 				localDiscuss.set("discussID", rs.getInt("discuss_id"));
 				localDiscuss.set("name", rs.getString("name"));
@@ -145,15 +145,15 @@ public class Discuss {
 				localDiscuss.set("groupID", rs.getInt("group_id"));
 				localDiscuss.set("status", rs.getInt("status"));
 				localDiscuss.set("controller", rs.getString("controller"));
-				discusses.add(localDiscuss);
+				res = localDiscuss;
 			}
 			rs.close();
 		} catch (Exception e) {
 			Logger.getLogger(Discuss.class.getName()).log(Level.SEVERE, null, e);
 			return new Msg(ErrorCode.UNKNOWN);
 		}
-		if (discusses.size() == 1)
-			return new Msg(ErrorCode.SUCCESS, discusses);
+		if (res != null)
+			return new Msg(ErrorCode.SUCCESS, res);
 		else
 			return new Msg(ErrorCode.DISCUSS_NOT_EXIST);
 	}

@@ -145,6 +145,11 @@ public class C2SStaff extends Thread {
 					discuss = new Gson().fromJson(tmp, TXObject.class);
 					res = Discuss.getAllDiscusses(discuss);
 					break;
+					
+				case RequestCode.GET_DISCUSS_BY_DISCUSS_ID:
+					discuss = new Gson().fromJson(tmp, TXObject.class);
+					res = Discuss.getDiscussById(discuss);
+					break;
 
 				case RequestCode.JOIN_DISCUSS:
 					discuss = new Gson().fromJson(tmp, TXObject.class);

@@ -48,6 +48,7 @@ public class RequestCode {
     public static final int SEND_BOARD_MESSAGE = 32;
     public static final int GET_BOARD_MESSAGE = 33;
     public static final int GET_ALL_DISCUSSES = 34;
+    public static final int GET_DISCUSS_BY_DISCUSS_ID = 35;
     
     /* received code */
     public static final int NEW_GROUP_MESSAGE = 1000;

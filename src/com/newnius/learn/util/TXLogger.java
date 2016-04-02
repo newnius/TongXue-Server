@@ -10,7 +10,7 @@ package com.newnius.learn.util;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Logger {
+public class TXLogger {
 	private static Set<String> tags = new HashSet<>();
 	private static int level = 0;
 	public static final int LEVEL_INFO = 0;

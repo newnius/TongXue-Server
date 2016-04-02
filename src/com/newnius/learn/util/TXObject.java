@@ -40,6 +40,14 @@ public class TXObject {
 		}
 		data.put(key, value + "");
 	}
+	
+    public void set(String key, Float value){
+        if(data.containsKey(key)) {
+            data.remove(key);
+            TXLogger.debug(TAG, key+" is already set.");
+        }
+        data.put(key, value+"");
+    }
 
 	public String get(String key) {
 		if (data.containsKey(key))
@@ -69,6 +77,17 @@ public class TXObject {
 			return 0;
 		}
 	}
+	
+    public Float getFloat(String key) {
+        try {
+            if (data.containsKey(key))
+                return Float.parseFloat(data.get(key));
+            TXLogger.warn(TAG, key + " not exist.");
+            return null;
+        }catch(Exception ex){
+            return null;
+        }
+    }
 
 	public boolean hasKey(String key) {
 		return data.containsKey(key) && data.get(key) != null;
