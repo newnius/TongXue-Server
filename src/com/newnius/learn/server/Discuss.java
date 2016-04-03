@@ -20,11 +20,12 @@ public class Discuss {
 		if (currentUser == null)
 			return new Msg(ErrorCode.USER_NOT_EXIST);
 		discuss.set("controller", currentUser.get("username"));
-
+		discuss.set("status", 0);
+		discuss.set("time", System.currentTimeMillis());
 		try {
 			String sql = "INSERT INTO `discuss` (`name`, `group_id`, `controller`, `time`) VALUES (?, ?, ?, ?)";
 			String[] args = { discuss.get("name"), discuss.getInt("groupID") + "", discuss.get("controller"),
-					System.currentTimeMillis() + "" };
+					 discuss.getLong("time")+ "" };
 			int cnt = DAO.executeUpdate(sql, args);
 			if (cnt == 1) {
 				sql = "select @@identity";
@@ -33,6 +34,7 @@ public class Discuss {
 				if (rs.next())
 					discussID = rs.getInt(1);
 				discuss.set("discussID", discussID);
+				joinDiscuss(discuss, currentUser);
 				return new Msg(ErrorCode.SUCCESS, discuss);
 			} else {
 				return new Msg(ErrorCode.UNKNOWN);
@@ -112,6 +114,11 @@ public class Discuss {
 			String[] args = { currentUser.get("username") };
 			int cnt = DAO.executeUpdate(sql, args);
 			if (cnt == 1) {
+				/* set status to close if controller quit */
+				sql = "UPDATE `discuss` SET `status` = 2 WHERE `discuss_id` = ? AND `controller` = ?";
+				String[] args2 = {discuss.getInt("discussID") +"", currentUser.get("username")};
+				DAO.executeUpdate(sql, args2);
+				
 				return new Msg(ErrorCode.SUCCESS);
 			} else {
 				return new Msg(ErrorCode.UNKNOWN);
