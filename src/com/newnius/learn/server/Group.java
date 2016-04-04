@@ -2,7 +2,9 @@ package com.newnius.learn.server;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -330,7 +332,11 @@ public class Group {
 				rs.next();
 				int mid = rs.getInt(1);
 				message.set("mid", mid);
-				S2CServer.broadcast(getGroupMembers(group), new Msg(RequestCode.NEW_GROUP_MESSAGE, message));
+				/* broadcast this message to all joiners except sender */
+				Set<TXObject> users = new HashSet<TXObject>();
+				users.addAll(getGroupMembers(group));
+				users.remove(user);
+				S2CServer.broadcast(users, new Msg(RequestCode.NEW_GROUP_MESSAGE, message));
 				return ErrorCode.SUCCESS;
 			} else {
 				return ErrorCode.UNKNOWN;

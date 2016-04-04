@@ -2,7 +2,9 @@ package com.newnius.learn.server;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -194,7 +196,13 @@ public class Discuss {
 				rs.next();
 				int mid = rs.getInt(1);
 				message.set("messageID", mid);
-				S2CServer.broadcast(getDiscussMembers(message), new Msg(RequestCode.NEW_BOARD_MESSAGE, message));
+				/* broadcast this message to all joiners except sender */
+				Set<TXObject> users = new HashSet<TXObject>();
+				users.addAll(getDiscussMembers(message));
+				TXObject user = new TXObject();
+				user.set("username", currentUser.get("username"));
+				users.remove(user);
+				S2CServer.broadcast(users, new Msg(RequestCode.NEW_BOARD_MESSAGE, message));
 				return new Msg(ErrorCode.SUCCESS);
 			} else {
 				return new Msg(ErrorCode.UNKNOWN);

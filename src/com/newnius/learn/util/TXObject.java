@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by newnius on 16-3-16.
@@ -96,6 +97,10 @@ public class TXObject {
 	public String toJson() {
 		return new Gson().toJson(data);
 	}
+	
+	public Set<String> keySet(){
+		return this.data.keySet();
+	}
 
 	public static TXObject fromJson(String json) {
 		try {
@@ -106,5 +111,36 @@ public class TXObject {
 			return null;
 		}
 	}
+	
+	
+	
+
+	@Override
+	public int hashCode() {
+		return keySet().size();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		System.out.println("compare");
+		if(obj==null)
+			return false;
+		if(!(obj instanceof TXObject))
+			return false;
+		TXObject tXObject = (TXObject)obj;
+		System.out.println(this.toJson());
+		System.out.println(" vs ");
+		System.out.println(tXObject.toJson());
+		
+		if(this.keySet().size() != tXObject.keySet().size())
+			return false;
+		for(String key: this.data.keySet()){
+			if(!tXObject.hasKey(key) || !this.get(key).equals(tXObject.get(key))){
+				return false;
+			}
+		}
+		return true;
+	}	
+	
 
 }

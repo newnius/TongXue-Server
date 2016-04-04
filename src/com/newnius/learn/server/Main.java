@@ -5,7 +5,6 @@
  */
 package com.newnius.learn.server;
 
-
 /**
  * 
  * @author Newnius
@@ -21,8 +20,6 @@ public class Main {
 		Config.startServer();
 		new Thread(new C2SServer()).start();
 		new Thread(new S2CServer()).start();
-		
-		
 	}
 	
 	private static void init(){

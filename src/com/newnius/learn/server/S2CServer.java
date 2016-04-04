@@ -3,7 +3,7 @@ package com.newnius.learn.server;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +32,7 @@ public class S2CServer implements Runnable {
 		}
 	}
 
-	public static void broadcast(List<TXObject> users, Msg msg) {
+	public static void broadcast(Set<TXObject> users, Msg msg) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -40,31 +40,6 @@ public class S2CServer implements Runnable {
 				synchronized (user2staffMutex) {
 					try {
 						String sendStr = new Gson().toJson(msg);
-						Logger.getLogger(S2CServer.class.getName()).log(Level.INFO, "S2C sent: " + sendStr);
-
-						for (TXObject user : users) {
-							Logger.getLogger(S2CServer.class.getName()).log(Level.INFO, "to:" + user.get("username"));
-							S2CStaff staff = user2staff.get(user.get("username"));
-							if (staff == null)
-								continue;
-							staff.send(sendStr);
-						}
-					} catch (Exception ex) {
-						ex.printStackTrace();
-						//Logger.getLogger(S2CServer.class.getName()).log(Level.SEVERE, null, ex);
-					}
-				}
-			}
-		}).start();
-	}
-	
-	public static void broadcast(List<TXObject> users, String sendStr) {
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				synchronized (user2staffMutex) {
-					try {
 						Logger.getLogger(S2CServer.class.getName()).log(Level.INFO, "S2C sent: " + sendStr);
 
 						for (TXObject user : users) {
