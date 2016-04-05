@@ -192,6 +192,12 @@ public class C2SStaff extends Thread {
 					code = Blog.upArticle(currentUser, article);
 					res = new Msg(code);
 					break;
+				case RequestCode.DELETE_ARTICLE:
+					article = new Gson().fromJson(tmp, TXObject.class);
+					code = Blog.deleteArticle(currentUser, article);
+					res = new Msg(code);
+					break;
+					
 				case RequestCode.SEARCH_ARTICLE:// get article by id
 					article = new Gson().fromJson(tmp, TXObject.class);
 					List<TXObject> articles = Blog.getArticles(article);

@@ -146,10 +146,10 @@ public class User {
 			String sql = "select count(1) from user where `username` = ?";
 			String[] args = { username };
 			ResultSet rs = DAO.executeQuery(sql, args);
-			return rs.getInt(0)>0;
+			return rs.next()&&rs.getInt(1)>0;
 		} catch (Exception ex) {
 			Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-			return false;
+			return true;
 		}
 	}
 
@@ -158,11 +158,11 @@ public class User {
 			String sql = "select 1 from `user` where `email` = ?";
 			String[] args = { email };
 			ResultSet rs = DAO.executeQuery(sql, args);
-			return rs.getFetchSize() > 0;
+			return rs.next()&&rs.getInt(1) > 0;
 
 		} catch (Exception ex) {
 			Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
-			return false;
+			return true;
 		}
 	}
 

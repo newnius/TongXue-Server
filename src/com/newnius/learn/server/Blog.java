@@ -10,31 +10,24 @@ import com.newnius.learn.util.TXObject;
 public class Blog {
 
 	public static int postArticle(TXObject user, TXObject article) {
-		if(user==null || !user.hasKey("username"))
+		if (user == null || !user.hasKey("username"))
 			return ErrorCode.USER_NOT_EXIST;
-		if(article==null)
+		if (article == null)
 			return ErrorCode.ARTICLE_NOT_EXIST;
-		if(!article.hasKey("title"))
+		if (!article.hasKey("title"))
 			return ErrorCode.TITLE_IS_EMPTY;
-		if(!article.hasKey("content"))
+		if (!article.hasKey("content"))
 			return ErrorCode.CONTENT_IS_EMPTY;
-		if(!article.hasKey("category"))
+		if (!article.hasKey("category"))
 			article.set("category", 0);
-		if(!article.hasKey("cover"))
+		if (!article.hasKey("cover"))
 			article.set("cover", "default-article-cover.gif");
 		article.set("author", user.get("username"));
-		
 
 		try {
 			String sql = "INSERT INTO `blog_article` ( `title`, `content`, `time`, `author`, `category`, `cover`) VALUES( ?, ?, ?, ?, ?, ?)";
-			String[] args1 = { 
-					article.get("title"), 
-					article.get("content"), 
-					System.currentTimeMillis() + "",
-					article.get("author"), 
-					article.getInt("category") + "", 
-					article.get("cover") 
-			};
+			String[] args1 = { article.get("title"), article.get("content"), System.currentTimeMillis() + "",
+					article.get("author"), article.getInt("category") + "", article.get("cover") };
 			int affected_rows = DAO.executeUpdate(sql, args1);
 			if (affected_rows == 1) {
 				return ErrorCode.SUCCESS;
@@ -48,32 +41,25 @@ public class Blog {
 	}
 
 	public static int updateArticle(TXObject user, TXObject article) {
-		if(user==null || !user.hasKey("username"))
+		if (user == null || !user.hasKey("username"))
 			return ErrorCode.USER_NOT_EXIST;
-		if(article==null || !article.hasKey("articleID"))
+		if (article == null || !article.hasKey("articleID"))
 			return ErrorCode.ARTICLE_NOT_EXIST;
-		if(!article.hasKey("title"))
+		if (!article.hasKey("title"))
 			return ErrorCode.TITLE_IS_EMPTY;
-		if(!article.hasKey("content"))
+		if (!article.hasKey("content"))
 			return ErrorCode.CONTENT_IS_EMPTY;
-		if(!article.hasKey("category"))
+		if (!article.hasKey("category"))
 			article.set("category", 0);
-		if(!article.hasKey("cover"))
+		if (!article.hasKey("cover"))
 			article.set("cover", "default-article-cover.gif");
 		article.set("author", user.get("username"));
-		
 
 		try {
 			String sql = "UPDATE `blog_article` SET  `title` =?  , `content` = ?, `time` = ?, `category` = ?, `cover` = ? ) VALUES( ?, ?, ?, ?, ?) WHERE `article_id` = ? AND `author` = ?";
-			String[] args1 = { 
-					article.get("title"), 
-					article.get("content"), 
-					System.currentTimeMillis() + "",
-					article.getInt("category") + "",
-					article.get("cover"),
-					article.getInt("articleID")+"",
-					article.get("author")
-			};
+			String[] args1 = { article.get("title"), article.get("content"), System.currentTimeMillis() + "",
+					article.getInt("category") + "", article.get("cover"), article.getInt("articleID") + "",
+					article.get("author") };
 			int affected_rows = DAO.executeUpdate(sql, args1);
 			if (affected_rows == 1) {
 				return ErrorCode.SUCCESS;
@@ -85,18 +71,18 @@ public class Blog {
 			return ErrorCode.UNKNOWN;
 		}
 	}
-	
-	public static List<TXObject> getArticles(TXObject article){
-		if(article==null)
+
+	public static List<TXObject> getArticles(TXObject article) {
+		if (article == null)
 			return getHottestArticle(article);
-		else if(article.hasKey("articleID"))
+		else if (article.hasKey("articleID"))
 			return getArticleById(article);
-		else if(article.hasKey("username"))
+		else if (article.hasKey("username"))
 			return getArticleByAuthor(article);
-		else if(article.hasKey("type-hottest"))
+		else if (article.hasKey("type-hottest"))
 			return getHottestArticle(article);
-			return getHottestArticle(article);
-		
+		return getHottestArticle(article);
+
 	}
 
 	private static List<TXObject> getArticleById(TXObject article) {
@@ -105,7 +91,7 @@ public class Blog {
 			String sql = "SELECT * FROM `blog_article` WHERE `article_id` = ?";
 			String[] args1 = { article.getInt("articleID") + "" };
 			ResultSet rs = DAO.executeQuery(sql, args1);
-			
+
 			if (rs != null && !rs.wasNull() && rs.next()) {
 				TXObject tmparticle = new TXObject();
 				tmparticle.set("articleID", rs.getInt("article_id"));
@@ -128,7 +114,7 @@ public class Blog {
 
 	private static List<TXObject> getArticleByAuthor(TXObject user) {
 		List<TXObject> articles = new ArrayList<>();
-		if(user==null || !user.hasKey("username"))
+		if (user == null || !user.hasKey("username"))
 			return articles;
 		TXObject article = new TXObject();
 		article.set("author", user.get("username"));
@@ -139,13 +125,14 @@ public class Blog {
 			page = 1;
 		int offset = (page - 1) * 10;
 		try {
-			String sql = "SELECT * FROM `blog_article` WHERE `author` = ? ORDER BY `article_id` LIMIT " + offset+", 10";
+			String sql = "SELECT * FROM `blog_article` WHERE `author` = ? ORDER BY `article_id` LIMIT " + offset
+					+ ", 10";
 			String[] args1 = { user.get("username") };
 			ResultSet rs = DAO.executeQuery(sql, args1);
-			
-			if(rs == null || rs.wasNull())
+
+			if (rs == null || rs.wasNull())
 				return articles;
-			
+
 			while (rs.next()) {
 				TXObject tmparticle = new TXObject();
 				tmparticle.set("articleID", rs.getInt("article_id"));
@@ -168,7 +155,7 @@ public class Blog {
 
 	private static List<TXObject> getHottestArticle(TXObject article) {
 		List<TXObject> articles = new ArrayList<>();
-		if(article==null)
+		if (article == null)
 			article = new TXObject();
 		int page = 1;
 		if (article.hasKey("page-no"))
@@ -177,13 +164,13 @@ public class Blog {
 			page = 1;
 		int offset = (page - 1) * 10;
 		try {
-			String sql = "SELECT * FROM `blog_article` ORDER BY `views` DESC LIMIT "+offset+" ,10";
-			String[] args1 = { };
+			String sql = "SELECT * FROM `blog_article` ORDER BY `views` DESC LIMIT " + offset + " ,10";
+			String[] args1 = {};
 			ResultSet rs = DAO.executeQuery(sql, args1);
-			if(rs == null || rs.wasNull())
+			if (rs == null || rs.wasNull())
 				return articles;
-			
-			while ( rs.next()) {
+
+			while (rs.next()) {
 				TXObject tmparticle = new TXObject();
 				tmparticle.set("articleID", rs.getInt("article_id"));
 				tmparticle.set("title", rs.getString("title"));
@@ -204,14 +191,19 @@ public class Blog {
 	}
 
 	public static int deleteArticle(TXObject user, TXObject article) {
-		if(user==null || !user.hasKey("username"))
+		if (user == null || !user.hasKey("username"))
 			return ErrorCode.USER_NOT_EXIST;
-		if(article==null || !article.hasKey("articleID"))
-			return ErrorCode.ARTICLE_NOT_EXIST;		
+		if (article == null || !article.hasKey("articleID"))
+			return ErrorCode.ARTICLE_NOT_EXIST;
+		List<TXObject> articles = getArticleById(article);
+		if (articles.size() == 0)
+			return ErrorCode.QUESTION_NOT_EXIST;
+		if (!articles.get(0).get("author").equals(user.get("username")))
+			return ErrorCode.NO_ACCESS;
 
 		try {
 			String sql = "DELETE FROM `blog_article` WHERE `article_id` = ? AND `author` = ?";
-			String[] args1 = { article.getInt("articleID")+"", user.get("username") };
+			String[] args1 = { article.getInt("articleID") + "", user.get("username") };
 			int affected_rows = DAO.executeUpdate(sql, args1);
 			if (affected_rows == 1) {
 				return ErrorCode.SUCCESS;
@@ -228,15 +220,14 @@ public class Blog {
 		return ErrorCode.SUCCESS;
 	}
 
-	
 	public static int commentAtArticle(TXObject user, TXObject comment) {
-		if(user==null || !user.hasKey("username"))
+		if (user == null || !user.hasKey("username"))
 			return ErrorCode.USER_NOT_EXIST;
-		if(comment==null || !comment.hasKey("articleID"))
+		if (comment == null || !comment.hasKey("articleID"))
 			return ErrorCode.ARTICLE_NOT_EXIST;
-		if(!comment.hasKey("content"))
+		if (!comment.hasKey("content"))
 			return ErrorCode.CONTENT_IS_EMPTY;
-		List<TXObject> articles  = getArticleById(comment);
+		List<TXObject> articles = getArticleById(comment);
 		if (articles.size() == 0) {
 			return ErrorCode.ARTICLE_NOT_EXIST;
 		}
@@ -250,13 +241,12 @@ public class Blog {
 			return ErrorCode.UNKNOWN;
 		}
 	}
-	
 
 	public static List<TXObject> getCommentsOfArticle(TXObject article) {
 		List<TXObject> comments = new ArrayList<>();
-		if(article==null || !article.hasKey("articleID"))
+		if (article == null || !article.hasKey("articleID"))
 			return comments;
-		if (getArticleById(article).size() == 0 )
+		if (getArticleById(article).size() == 0)
 			return comments;
 		try {
 			String sql = "SELECT * FROM `blog_comment` WHERE `article_id` = ?";
