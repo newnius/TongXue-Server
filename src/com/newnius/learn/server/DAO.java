@@ -27,7 +27,7 @@ public class DAO {
 			dbConnection = null;
 			Class.forName("com.mysql.jdbc.Driver");
 			dbConnection = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/learn?useUnicode=true&characterEncoding=utf-8", "tongxueclient", "VYCxRQKd8dSF");
+					"jdbc:mysql://mysq;:3306/learn?useUnicode=true&characterEncoding=utf-8", "tongxueclient", "VYCxRQKd8dSF");
 		} catch (Exception e) {
 			Logger.getLogger(DAO.class.getName()).log(Level.SEVERE, null, e);
 		}
